@@ -1,3 +1,6 @@
+from functools import reduce
+from operator import mul
+
 lines = open("data/day08.txt", "r").read().splitlines()
 T = []
 for i in lines:
@@ -21,20 +24,16 @@ for y in range(1, len(T) - 1):
         row = T[y]
         col = [T[i][x] for i in range(len(T))]
         t = T[y][x]
-        if (
-            t > max(row[:x])
-            or t > max(row[x+1:])
-            or t > max(col[:y])
-            or t > max(col[y+1:])
-        ):
+        l = row[x - 1::-1]
+        r = row[x + 1:]
+        u = col[y - 1::-1]
+        d = col[y + 1:]
+        dirs = [l, r, u, d]
+
+        if any(t > max(dr) for dr in dirs):
             visible += 1
+        vd = reduce(mul, [get_score(dr, t) for dr in dirs])
 
-        dl = get_score(row[x - 1::-1], t)
-        dr = get_score(row[x + 1:], t)
-        du = get_score(col[y - 1::-1], t)
-        dd = get_score(col[y + 1:], t)
-
-        vd = dl * du * dr * dd
         max_vd = max(vd, max_vd)
 
 print("Puzzle 7.1:", visible)
